@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../static/style.css">
+    <script src="../static/jquery-3.2.1.min.js"></script>
+    <script src="../static/Chart.min.js"></script>
+    <script src="../socket.io/socket.io.js"></script>
+    <style>
+th, td {
+  
+}
+th {
+  text-align: center;
+}
+</style>
+    <script>
+        var socket = io.connect("http://172.20.10.13:8000");
+	socket.on("connect", function() {
+		console.log("Connected socket server");
+	});
+        /*-----------------------------------------------------------*/
+        socket.on("chart-full", function (data) {
+           data = JSON.parse(data);
+           myChart.data.labels = data.time;
+           myChart.data.datasets[0].data = data.temperature;
+           myChart.data.datasets[1].data = data.humidity;
+        });
+        /*-----------------------------------------------------------*/
+        socket.on("dht11", function (data) {
+		console.log(data);
+            data = JSON.parse(data);
+            addData(myChart,data.time,[data.temperature,data.humidity]);
+	    document.getElementById('temperature').innerHTML = data.temperature; //update the date
+	    	if(data.temperature > 30){
+			document.getElementById('temperature').style.color = "red";
+		}
+		
+		
+	    document.getElementById('humidity').innerHTML = data.humidity; //update the date
+		
+        });
+        /*-----------------------------------------------------------*/
+        function addData(chart, label, data) {
+            chart.data.labels.push(label);
+            chart.data.datasets[0].data.push(data[0]);
+            chart.data.datasets[1].data.push(data[1]); 
+            chart.update();
+        };
+    </script>
+    <title>Chart</title>
+</head>
+<body>
+    <div style="margin-top: 0.5cm; margin-left: 1cm;">
+        <input type="button" value="Back Home" id="backhome" onclick="location.replace('file:///home/huytq/Documents/THCSau/page/index.html');"><br/>
+    </div>
+    <table style="width:100%">
+  <tr>
+    <th>Temperature<p id = 'temperature' style="color:green;">0</p></th>
+    <th>Humidity<p id = 'humidity' style="color:green;">0</p></th> 
+  </tr>
+  
+  
+</table>
+    <center>
+        <div ><canvas id="myChart"></canvas></div>
+	
+    </center>
+        <script>
+            var options = {
+                title: {
+                    display: true,
+                    text: "Home Weather",
+                    fontSize: 50,
+                    fontColor: ['rgb(40, 255, 4)'],
+                    fontStyle: "bold"
+		    
+                },
+                /****/
+                scales: {
+                    /**/
+                    xAxes : [{
+                            gridLines : {
+                                display : false
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: "Time",
+                                fontSize: 30,
+                                fontColor: ['rgb(128, 128, 128)']
+                            }
+                    }],
+                    /**/
+                    yAxes: [{
+                            id: "temp",
+                            position: 'left',
+                            type: 'linear',
+                            ticks: {
+                                min:28,
+                                max:34,
+                                stepSize:0.5
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: "Temperature",
+                                fontSize: 30,
+                                fontColor: ['rgb(255, 0, 0)']
+                            }
+                        },
+                        {
+                            id: "hum",
+                            position: 'right',
+                            type: 'linear',
+                            ticks: {
+                                min:80,
+                                max:100,
+                                stepSize:5
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: "Humidity",
+                                fontSize: 30,
+                                fontColor: ['rgb(0, 0, 255)']
+                            }
+                        }]
+                },
+                /****/
+                elements:{
+                    point:{
+                        radius: 0
+                    }
+                }
+            };
+            /*--------------------------------------------------------------------------*/
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var myChart = new Chart(ctx, {
+                title: "Hear",
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: "Temperature",
+                        yAxisID: 'temp',
+                        data: [],
+                        backgroundColor: ['rgba(255, 255, 255, 0.2)'],
+                        borderColor: ['rgb(255, 0, 0)'],
+                        borderWidth: 5
+                    },
+                        {
+                            label: "Humidity",
+                            yAxisID: 'hum',
+                            data: [],
+                            backgroundColor: ['rgba(255, 255, 255, 0.2)'],
+                            borderColor: ['rgb(0, 0, 255)'],
+                            borderWidth: 5
+                        }
+                    ]
+                },
+                options: options
+            });
+    </script>
+</body>
+</html>

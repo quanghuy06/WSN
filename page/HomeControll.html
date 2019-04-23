@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Controller</title>
+    <style>
+
+	`
+	#Button_logo{
+            width: auto; height: auto; margin: auto; margin-top: 2cm; text-align: center; font-size: 200%; font-weight: bold; color: #c68a3f;
+        }
+    </style>
+    <link rel="stylesheet" href="../static/style.css">
+    <script src="../static/jquery-3.2.1.min.js"></script>
+    <script src="../socket.io/socket.io.js"></script>
+    <script>
+	var socket = io.connect("http://172.20.10.13:8000");
+	socket.on("connect", function() {
+		console.log("Connected socket server");
+	});
+    </script>
+    <script>
+        var socket = io.connect("http://172.20.10.13:8000");
+	socket.on("connect", function() {
+		console.log("Connected socket server");
+	});
+	
+	socket.on("dht11", function (data) {
+		console.log(data);
+            	data = JSON.parse(data);
+		document.getElementById('temperature').innerHTML = data.temperature; //update the date
+		if(data.temperature > 30){
+			document.getElementById('temp').style.backgroundColor = "red";
+		}
+		if((data.temperature >= 29) & (data.temperature <= 30)){
+			document.getElementById('temp').style.backgroundColor = "coral";
+		}
+		if(data.temperature < 29){
+			document.getElementById('temp').style.backgroundColor = "#f7c80c";
+		}
+		
+		document.getElementById('humidity').innerHTML = data.humidity; //update the date
+		if(data.humidity > 90){
+			document.getElementById('hum').style.backgroundColor = "#0d8ac4";
+		}
+		if((data.humidity >= 88) & (data.temperature <= 90)){
+			document.getElementById('hum').style.backgroundColor = "#79eaea";
+		}
+		if(data.humidity < 88){
+			document.getElementById('hum').style.backgroundColor = "#c4c2bc";
+		}
+        });
+    </script>
+    <script>
+        socket.on("status_device", function (data) {
+            if(data.device=='on')
+                $("#switch-input").prop("checked", true);
+        });
+        /*----------------------------------------------------------*/
+        socket.on("status_device", function (data) {
+           if(data=='on')
+               $("#switch-input").prop("checked", true);
+           else
+               $("#switch-input").prop("checked", false); 
+        });
+	
+        /*----------------------------------------------------------*/
+        /*----------------------------------------------------------*/
+        function send() {
+            var status_device = jQuery("#switch-input").is(':checked')?'on':'off';
+            socket.emit("status_device", status_device);
+	}
+    </script>
+    <script>
+	function updateSlider(slideAmount) {
+			socket.emit("Range",{led1:slideAmount});
+	    }
+		
+    </script>
+    
+</head>
+<body style="background-color: #b7ffff;>
+
+    <div style="margin-top: 0.5cm; margin-left: 1cm;">
+    <input type="button" value="Back Home" id="backhome" onclick="location.replace('file:///home/huytq/Documents/THCSau/page/index.html');"><br/>
+    </div>
+    <div id="Button_logo" style="margin-left: 700px; font-size: 30px; color: green;">Light Control</div>
+    <div style="margin-left: 700px;"><img src="https://digitrends.com.vn/wp-content/uploads/2018/12/loai-bong-den.jpg" width="160px" height="190px;"></div>
+    <div style="margin-left: 100px; margin-top: -190px;"><img src="https://bics.com/wp-content/uploads/2016/07/Clean-IoT.png" width="350px" height="210px;"></div>
+    <div style="margin-left: 1070px; margin-top: -190px;"><img src="https://9127bc958be91bbd969f-1ffecbce292e26e7bb95f108b8aeb120.ssl.cf3.rackcdn.com/IoT_image.jpg" width="350px" height="200px;"></div>	
+    <div id="floor_select">
+        <center>
+            <table style="text-align: left; font-size: 30px; font-weight: bold; color: green;">
+                <tr>
+                    <td>Light</td>
+                    <td>
+                        <label class="switch">
+                            <input class="switch-input" id="switch-input" type="checkbox" onclick="send();"/>
+                            <span class="switch-label" data-on="On" data-off="Off"></span>
+                            <span class="switch-handle"></span>
+                        </label>
+                    </td>
+                </tr>
+            </table>
+        </center>
+    </div>
+    <br>
+    <br>
+    <div id="Button_logo" style="margin-left: 700px;  font-size: 30px; color: green;">Brightness</div>
+    <center>
+    	<div class="""slidecontainer">
+  		<input type="range" min="1" max="255" value="50" class="slider" id="myRange" onchange="updateSlider(this.value)">
+	</div>
+  		<p>Value: <span id="value"></span></p>
+    	</div>
+	<div style="margin-left: -500px; margin-top: -20px;">
+	<img src="https://cdn0.iconfinder.com/data/icons/nature-1-7/52/7-512.png" width="240p" height="180">
+	</div>
+	<div style="margin-left: 550px; margin-top: -210px;" >
+     		<img src="https://cdn4.iconfinder.com/data/icons/autumn-24/32/thermometer-autumn-humidity-fall-rain-temperature-measure-512.png"  width="250p" height="200">
+	</div>
+	<div id="hum" style="width: 50px; height: 30px;background-color: green;color: white; margin-left:700px; margin-top: -70px;">
+		<center><p id='humidity'>0</p></center>
+	</div>
+	<div id="temp" style="width: 50px; height: 30px;background-color: coral;color: white;margin-left:-650px; margin-top: -50px;">
+		<center><p id='temperature'>0</p></center>
+	</div>
+	<script>
+	var slider = document.getElementById("myRange");
+	var output = document.getElementById("value");
+	output.innerHTML = slider.value;
+	slider.oninput = function() {
+  		output.innerHTML = this.value;
+		console.log(this.value);
+	}
+    	</script>
+    </center>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="../static/style.css">
+    <script src="../static/jquery-3.2.1.min.js"></script>
+    <script src="../static/Chart.min.js"></script>
+    <script src="../socket.io/socket.io.js"></script>
+    <script>
+        var socket = io.connect("http://172.20.10.13:8000");
+	socket.on("connect", function() {
+		console.log("Connected socket server");
+	});
+	
+	socket.on("dht11", function (data) {
+		console.log(data);
+            	data = JSON.parse(data);
+		document.getElementById('temperature').innerHTML = data.temperature; //update the date
+		if(data.temperature > 30){
+			document.getElementById('temp').style.backgroundColor = "red";
+		}
+		if((data.temperature >= 29) & (data.temperature <= 30)){
+			document.getElementById('temp').style.backgroundColor = "coral";
+		}
+		if(data.temperature < 29){
+			document.getElementById('temp').style.backgroundColor = "#f7c80c";
+		}
+                document.getElementById('humidity').innerHTML = data.humidity; //update the date
+		if(data.humidity > 90){
+			document.getElementById('hum').style.backgroundColor = "#0d8ac4";
+		}
+		if((data.humidity >= 88) & (data.temperature <= 90)){
+			document.getElementById('hum').style.backgroundColor = "#79eaea";
+		}
+		if(data.humidity < 88){
+			document.getElementById('hum').style.backgroundColor = "#c4c2bc";
+		}
+        });
+    </script>
+    <title>Home</title>
+    <style>	
+        body{
+            width: auto; height: auto; margin: auto; background-color: white;
+        }
+        #home_logo{
+            width: auto; height: auto; margin: auto; margin-top: 2cm; text-align: center; font-size: 400%; font-weight: bold; color: #e8e863;
+        }
+        #home_select{
+            width: auto; height: auto; margin: auto; margin-top: 1cm; text-align: center; font-size: 200%;
+        }
+        input[type="button"]{
+            width: 200px; height: 50px; background-color:#44c767; border-radius:10px;
+            display:inline-block; cursor:pointer; color:#ffffff;
+            font-family:Arial; font-size:17px; font-weight:bold; text-decoration:none;
+            outline: none;  margin-top: 0.5cm;
+        }
+        input[type="button"]:hover{
+            background-color: #44c444;
+        }
+    </style>
+</head>
+<body style=background-color:powderblue;>
+    <div id="home_logo">Home Control</div>
+    <div id="home_select">
+        <input type="button" value="Control" onclick="location.replace('file:///home/huytq/Documents/THCSau/page/HomeControll.html');"><br/>
+        <input type="button" value="Chart"   onclick="location.replace('file:///home/huytq/Documents/THCSau/page/chart.html');"><br/>
+	<input type="button" value="About Me"   onclick="location.replace('file:///home/huytq/Documents/THCSau/page/my.html');"><br/>
+    </div>
+	
+    <div style="margin-left: 120px; margin-top: -300px;"><img src="https://media.threatpost.com/wp-content/uploads/sites/103/2018/04/19131106/IoT_Illustration.png" width="350px" height="300px;"></div>
+    <div style="margin-left: 1120px; margin-top: -300px;"><img src="https://thumbor.forbes.com/thumbor/1280x868/https%3A%2F%2Fblogs-images.forbes.com%2Flouiscolumbus%2Ffiles%2F2019%2F02%2FTop-and-Hottest-25-IoT-Startups-to-Watch-In-2019-Final.jpg" width="350px" height="300px;"></div>
+<br>
+<br>
+<div style="margin-left: 390px; margin-top: -5px;">
+	<img src="https://cdn0.iconfinder.com/data/icons/nature-1-7/52/7-512.png" width="240p" height="180">
+	</div>
+	<div style="margin-left: 880px; margin-top: -170px;">
+     		<img src="https://cdn4.iconfinder.com/data/icons/autumn-24/32/thermometer-autumn-humidity-fall-rain-temperature-measure-512.png"  width="220p" height="160">
+	</div>
+	<div id="hum" style="width: 50px; height: 30px;background-color: green;color: white; margin-left:1040px; margin-top: -70px;">
+		<center><p id='humidity'>0</p></center>
+	</div>
+	<div id="temp" style="width: 50px; height: 30px;background-color: coral;color: white;margin-left:420px; margin-top: -50px;">
+		<center><p id='temperature'>0</p></center>
+	</div>
+
+</body>
+</html>
